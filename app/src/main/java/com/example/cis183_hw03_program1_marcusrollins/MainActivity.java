@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity
 {
+    DatabaseHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -30,5 +31,17 @@ public class MainActivity extends AppCompatActivity
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        //GUI Elements
+
+
+
+
+        //make new instance of the dbHelper
+        dbHelper = new DatabaseHelper(this);
+
+        //initialize all of the tables with dummy data
+        //there is logic in this function to ensure this is not done more than once.
+        dbHelper.initAllTables();
     }
 }
