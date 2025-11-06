@@ -29,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //this is where we will create the tables in our database
         //Create table in the database
         //execute the sql statement on the database that was passed to the function called db
-        db.execSQL("CREATE TABLE " + students_table_name + " (username varchar(50) primary key autoincrement not null, fname varchar(50), lname varchar(50), email varchar(50), age integer, gpa real, majorId integer, foreign key (majorId) references " + majors_table_name + "(majorId));");
+        db.execSQL("CREATE TABLE " + students_table_name + " (username varchar(50) primary key not null, fname varchar(50), lname varchar(50), email varchar(50), age integer, gpa real, majorId integer, foreign key (majorId) references " + majors_table_name + "(majorId));");
         db.execSQL("CREATE TABLE " + majors_table_name + " (majorId integer primary key autoincrement not null, majorName varchar(50), majorPrefix varchar(10));");
     }
 
@@ -71,10 +71,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //Insert sample student records into the students table.
             //Each student has a unique username (primary key)
             //Along with personal information and a major
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorName) VALUES ('marcusro26', 'Marcus', 'Rollins', 'mrollins626@gmail.com', '23', '3.33', 'Computer Science');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorName) VALUES ('madisonho09', 'Madison', 'Homestead', 'madisonhomestead09@gmail.com', '23', '3.40', 'Environmental Science');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorName) VALUES ('sophie615', 'Sophie', 'Rollins', 'srollins615@gmail.com', '18', '3.54', 'Esthetician');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorName) VALUES ('steven711', 'Steven', 'Rollins', 'srollins7112@gmail.com', '56', '3.68', 'Electrician');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('marcusro26', 'Marcus', 'Rollins', 'mrollins626@gmail.com', '23', '3.33', '656');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('madisonho09', 'Madison', 'Homestead', 'madisonhomestead09@gmail.com', '23', '3.40', '541');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('sophie615', 'Sophie', 'Rollins', 'srollins615@gmail.com', '18', '3.54', '222');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('steven711', 'Steven', 'Rollins', 'srollins7112@gmail.com', '56', '3.68', '444');");
 
             //Close the database
             db.close();
@@ -137,6 +137,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Major majorId = new Major();
                 majorId.setMajorId(cursor.getInt(cursor.getColumnIndexOrThrow("majorId")));
 
+                //***I need to add another cursor here or below adding the ID to find the majors name so that can be attached to the listview instead of the ID***
+
                 //Attach that major to the student
                 student.setMajorId(majorId);
 
@@ -167,5 +169,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         //Return true if the username is taken already
         return count > 0;
+    }
+
+    public void addStudentToDB(Student s)
+    {
+        //get an instance of a writeable database
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        String insertStudent = "INSERT INTO " + students_table_name + " (fname, lname, email) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajorId() + "');";
+        db.execSQL(insertStudent);
+
+        db.close();
     }
 }

@@ -43,5 +43,9 @@ public class MainActivity extends AppCompatActivity
         //initialize all of the tables with dummy data
         //there is logic in this function to ensure this is not done more than once.
         dbHelper.initAllTables();
+
+        //I NEED TO CALL getAllStudents(), usernameExists(), and addStudentToDB() (Just have to finish the java side code)**************************************
+
+
     }
 }

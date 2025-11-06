@@ -7,13 +7,35 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ListView
+        android:id="@+id/lv_v_listOfStudents"
+        android:layout_width="411dp"
+        android:layout_height="604dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/btn_v_addStudent"
+        android:layout_width="127dp"
+        android:layout_height="65dp"
+        android:text="Add Student"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="637dp" />
+
+    <Button
+        android:id="@+id/btn_v_addMajor"
+        android:layout_width="116dp"
+        android:layout_height="66dp"
+        android:text="Add Major"
+        tools:layout_editor_absoluteX="155dp"
+        tools:layout_editor_absoluteY="636dp" />
+
+    <Button
+        android:id="@+id/btn_v_searchData"
+        android:layout_width="126dp"
+        android:layout_height="65dp"
+        android:text="Search Data"
+        tools:layout_editor_absoluteX="278dp"
+        tools:layout_editor_absoluteY="636dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
