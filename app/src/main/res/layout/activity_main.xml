@@ -10,32 +10,37 @@
     <ListView
         android:id="@+id/lv_v_listOfStudents"
         android:layout_width="411dp"
-        android:layout_height="604dp"
+        android:layout_height="575dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_v_addMajor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/btn_v_addStudent"
-        android:layout_width="127dp"
-        android:layout_height="65dp"
+        android:layout_width="130dp"
+        android:layout_height="100dp"
         android:text="Add Student"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="637dp" />
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btn_v_addMajor"
-        android:layout_width="116dp"
-        android:layout_height="66dp"
+        android:layout_width="124dp"
+        android:layout_height="99dp"
         android:text="Add Major"
-        tools:layout_editor_absoluteX="155dp"
-        tools:layout_editor_absoluteY="636dp" />
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_v_searchData"
+        app:layout_constraintStart_toEndOf="@+id/btn_v_addStudent" />
 
     <Button
         android:id="@+id/btn_v_searchData"
-        android:layout_width="126dp"
-        android:layout_height="65dp"
+        android:layout_width="125dp"
+        android:layout_height="98dp"
         android:text="Search Data"
-        tools:layout_editor_absoluteX="278dp"
-        tools:layout_editor_absoluteY="636dp" />
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

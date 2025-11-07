@@ -20,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //change the version number
         //super is used to call the functionality of the base class SQLiteOpenHelper and
         //then executes the extended (DatabaseHelper)
-        super(c, database_name, null, 1);
+        super(c, database_name, null, 3);
     }
 
     //this is called when a new database
@@ -29,7 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //this is where we will create the tables in our database
         //Create table in the database
         //execute the sql statement on the database that was passed to the function called db
-        db.execSQL("CREATE TABLE " + students_table_name + " (username varchar(50) primary key not null, fname varchar(50), lname varchar(50), email varchar(50), age integer, gpa real, majorId integer, foreign key (majorId) references " + majors_table_name + "(majorId));");
+        db.execSQL("CREATE TABLE " + students_table_name + " (username varchar(50) primary key not null, fName varchar(50), lName varchar(50), email varchar(50), age integer, gpa real, majorName varchar(50), foreign key (majorName) references " + majors_table_name + "(majorName));");
         db.execSQL("CREATE TABLE " + majors_table_name + " (majorId integer primary key autoincrement not null, majorName varchar(50), majorPrefix varchar(10));");
     }
 
@@ -44,11 +44,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public String getUserTableName() {
+    public String getStudentsTableName()
+    {
         return students_table_name;
     }
 
-    public String getPostsTableName() {
+    public String getMajorsTableName()
+    {
         return majors_table_name;
     }
 
@@ -71,10 +73,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //Insert sample student records into the students table.
             //Each student has a unique username (primary key)
             //Along with personal information and a major
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('marcusro26', 'Marcus', 'Rollins', 'mrollins626@gmail.com', '23', '3.33', '656');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('madisonho09', 'Madison', 'Homestead', 'madisonhomestead09@gmail.com', '23', '3.40', '541');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('sophie615', 'Sophie', 'Rollins', 'srollins615@gmail.com', '18', '3.54', '222');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fname, lname, email, age, gpa, majorId) VALUES ('steven711', 'Steven', 'Rollins', 'srollins7112@gmail.com', '56', '3.68', '444');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('marcusro26', 'Marcus', 'Rollins', 'mrollins626@gmail.com', '23', '3.33', 'Computer Science');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('madisonho09', 'Madison', 'Homestead', 'madisonh09@gmail.com', '23', '3.40', 'Environmental Science');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('sophie615', 'Sophie', 'Rollins', 'srollins615@gmail.com', '18', '3.54', 'Esthetician');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('steven711', 'Steven', 'Rollins', 'srollins7112@gmail.com', '56', '3.68', 'Electrician');");
 
             //Close the database
             db.close();
@@ -84,7 +86,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void initMajors() {
         //Only add the data if the majors table is currently empty
         //This makes it so I cannot get duplicate majors every run
-        if (countRecordsFromTable(majors_table_name) == 0) {
+        if (countRecordsFromTable(majors_table_name) == 0)
+        {
             //We need a writable version because we are going to write to the database
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -102,7 +105,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public int countRecordsFromTable(String tableName) {
+    public int countRecordsFromTable(String tableName)
+    {
         //Get an instance of the a readable database
         //We only need readable because we are not adding anything to the database with this
         SQLiteDatabase db = this.getReadableDatabase();
@@ -128,19 +132,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             do {
                 Student student = new Student();
                 student.setUsername(cursor.getString(cursor.getColumnIndexOrThrow("username")));
-                student.setFname(cursor.getString(cursor.getColumnIndexOrThrow("fname")));
-                student.setLname(cursor.getString(cursor.getColumnIndexOrThrow("lname")));
+                student.setFname(cursor.getString(cursor.getColumnIndexOrThrow("fName")));
+                student.setLname(cursor.getString(cursor.getColumnIndexOrThrow("lName")));
                 student.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
                 student.setAge(cursor.getInt(cursor.getColumnIndexOrThrow("age")));
                 student.setGpa(cursor.getDouble(cursor.getColumnIndexOrThrow("gpa")));
 
-                Major majorId = new Major();
-                majorId.setMajorId(cursor.getInt(cursor.getColumnIndexOrThrow("majorId")));
-
-                //***I need to add another cursor here or below adding the ID to find the majors name so that can be attached to the listview instead of the ID***
+                Major majorName = new Major();
+                majorName.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
 
                 //Attach that major to the student
-                student.setMajorId(majorId);
+                student.setMajorName(majorName);
 
                 studentList.add(student);
             } while (cursor.moveToNext());
@@ -176,9 +178,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //get an instance of a writeable database
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String insertStudent = "INSERT INTO " + students_table_name + " (fname, lname, email) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajorId() + "');";
-        db.execSQL(insertStudent);
+        //String insertStudent = "INSERT INTO " + students_table_name + " (fName, lName, email) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajorName() + "');";
+        //db.execSQL(insertStudent);
 
-        db.close();
+        //db.close();
     }
 }

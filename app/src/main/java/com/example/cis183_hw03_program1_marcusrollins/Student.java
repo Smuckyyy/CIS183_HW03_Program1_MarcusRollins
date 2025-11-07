@@ -3,32 +3,32 @@ package com.example.cis183_hw03_program1_marcusrollins;
 public class Student
 {
     private String username;
-    private String fname;
-    private String lname;
+    private String fName;
+    private String lName;
     private String email;
     private int age;
     private double gpa;
-    private Major majorId; //This is a FK to the Major table
+    private Major majorName; //This is a FK to the Major table
 
     public Student()
     {
     }
 
-    public Student(String fname, String lname, String username, String email, int age, double gpa, Major majorId)
+    public Student(String fName, String lName, String username, String email, int age, double gpa, Major majorName)
     {
         this.username = username;
-        this.fname = fname;
-        this.lname = lname;
+        this.fName = fName;
+        this.lName = lName;
         this.email = email;
         this.age = age;
         this.gpa = gpa;
-        this.majorId = majorId;
+        this.majorName = majorName;
     }
 
-    //I can call this function to get the majorId from the Major class/table
-    public Major getMajorId()
+    //I can call this function to get the majorName from the Major class/table
+    public Major getMajorName()
     {
-        return majorId;
+        return majorName;
     }
 
     //Getters and Setters
@@ -44,22 +44,22 @@ public class Student
 
     public String getFname()
     {
-        return fname;
+        return fName;
     }
 
-    public void setFname(String fname)
+    public void setFname(String fName)
     {
-        this.fname = fname;
+        this.fName = fName;
     }
 
     public String getLname()
     {
-        return lname;
+        return lName;
     }
 
-    public void setLname(String lname)
+    public void setLname(String lName)
     {
-        this.lname = lname;
+        this.lName = lName;
     }
 
     public String getEmail()
@@ -92,8 +92,8 @@ public class Student
         this.gpa = gpa;
     }
 
-    public void setMajorId(Major majorId)
+    public void setMajorName(Major majorName)
     {
-        this.majorId = majorId;
+        this.majorName = majorName;
     }
 }
