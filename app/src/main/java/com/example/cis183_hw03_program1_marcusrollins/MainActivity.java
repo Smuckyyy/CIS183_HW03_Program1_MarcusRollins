@@ -8,8 +8,10 @@
 
 package com.example.cis183_hw03_program1_marcusrollins;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity
         //Make new instance of the dbHelper
         dbHelper = new DatabaseHelper(this);
 
+
         //Initialize all of the tables with dummy data
         //There is logic in this function to ensure this is not done more than once.
         dbHelper.initAllTables();
@@ -63,12 +66,11 @@ public class MainActivity extends AppCompatActivity
 
         //I NEED TO CALL usernameExists(), and addStudentToDB() (Just have to finish the java side code)**************************************
 
-        //Add buttonCallListener for all of the buttons and their functions
+        buttonCallListeners();
         //Once you UPDATE or DELETE a student, you need to call this:
 
-        //studentsArrayList.clear();
-        //studentsArrayList.addAll(db.getAllStudents());
-        //notifyDataSetChanged();
+        studentsArrayList.addAll(db.getAllStudents());
+        notifyDataSetChanged();
 
         //Once that ^ is called, it will live update the database so that it reflects the changes
 
@@ -78,10 +80,33 @@ public class MainActivity extends AppCompatActivity
         checkTableRecordCount();
     }
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        ArrayList<Student> studentList = dbHelper.getAllStudents();
+        StudentAdapter adapter = new StudentAdapter(this, studentList);
+        lv_j_listOfStudents.setAdapter(adapter);
+    }
+
     //For testing purposes
     private void checkTableRecordCount()
     {
         Log.d("Students Record Count: ", dbHelper.countRecordsFromTable(dbHelper.getStudentsTableName()) + "");
         Log.d("Majors Record Count: ", dbHelper.countRecordsFromTable(dbHelper.getMajorsTableName()) + "");
+    }
+
+    private void buttonCallListeners()
+    {
+        //Add Student
+        btn_j_addStudent.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startActivity(new Intent(MainActivity.this, AddStudent.class));
+            }
+        });
     }
 }
