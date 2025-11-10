@@ -12,7 +12,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CIS183_HW03_Program1_MarcusRollins">
         <activity
+            android:name=".SearchStudent"
+            android:exported="false" />
+        <activity
             android:name=".AddStudent"
+            android:exported="false" />
+        <activity
+            android:name=".AddMajor"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

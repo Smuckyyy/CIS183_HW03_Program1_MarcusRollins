@@ -47,4 +47,9 @@ public class Major
     {
         this.majorPrefix = majorPrefix;
     }
+
+    public String toString()
+    {
+        return getMajorName();
+    }
 }

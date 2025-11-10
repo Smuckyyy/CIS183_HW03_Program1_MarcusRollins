@@ -12,68 +12,63 @@ import java.util.ArrayList;
 public class StudentAdapter extends BaseAdapter
 {
     private Context context;
-    private ArrayList<Student> studentsArrayList;
+    private ArrayList<Student> students;
     private LayoutInflater inflater;
+    private int layoutResource;
 
-    public StudentAdapter(Context context, ArrayList<Student> studentsArrayList)
-    {
+    public StudentAdapter(Context context, ArrayList<Student> students, int layoutResource) {
         this.context = context;
-        this.studentsArrayList = studentsArrayList;
+        this.students = students;
+        this.layoutResource = layoutResource;
         this.inflater = LayoutInflater.from(context);
     }
 
     @Override
-    public int getCount()
-    {
-        return studentsArrayList.size(); //The number of rows for students
-    }
+    public int getCount() { return students.size(); }
 
     @Override
-    public Object getItem(int position)
-    {
-        return studentsArrayList.get(position); //This grabs whatever is in the specific row, similar to the color adapter
-    }
+    public Object getItem(int position) { return students.get(position); }
 
     @Override
-    public long getItemId(int position)
-    {
-        return position; //Might want to change this to return to the Database once I polish
-    }
+    public long getItemId(int position) { return position; }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent)
-    {
-        if(convertView == null)
-        {
-            convertView = inflater.inflate(R.layout.student_cell, parent, false);
+    public View getView(int position, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = inflater.inflate(layoutResource, parent, false);
         }
 
-        //References to the TextViews inside of student_cell
-        TextView tv_j_username = convertView.findViewById(R.id.tv_v_row_username);
-        TextView tv_j_fName = convertView.findViewById(R.id.tv_v_row_fName);
-        TextView tv_j_lName = convertView.findViewById(R.id.tv_v_row_lName);
-        TextView tv_j_email = convertView.findViewById(R.id.tv_v_row_email);
-        TextView tv_j_major = convertView.findViewById(R.id.tv_v_row_major);
-        TextView tv_j_age = convertView.findViewById(R.id.tv_v_row_age);
-        TextView tv_j_gpa = convertView.findViewById(R.id.tv_v_row_gpa);
+        Student s = students.get(position);
 
-        //Get the current student
-        Student s = studentsArrayList.get(position);
+        //**Check which layout is being used** and reference the correct IDs
+        TextView tvUsername = convertView.findViewById(
+                layoutResource == R.layout.student_cell ? R.id.tv_v_cell_username : R.id.tv_v_cell_username
+        );
+        TextView tvFname = convertView.findViewById(
+                layoutResource == R.layout.student_cell ? R.id.tv_v_cell_fName : R.id.tv_v_cell_fName
+        );
+        TextView tvLname = convertView.findViewById(
+                layoutResource == R.layout.student_cell ? R.id.tv_v_cell_lName : R.id.tv_v_cell_lName
+        );
 
-        //Fill in data (listview)
-        tv_j_username.setText(s.getUsername());
-        tv_j_fName.setText(s.getFname());
-        tv_j_lName.setText(s.getLname());
-        tv_j_email.setText(s.getEmail());
-        tv_j_major.setText(s.getMajorName().getMajorName());
+        //**Optional null check**
+        if(tvUsername != null) tvUsername.setText(s.getUsername());
+        if(tvFname != null) tvFname.setText(s.getFname());
+        if(tvLname != null) tvLname.setText(s.getLname());
 
-        //Since age is an int, we have to code this differently
-        tv_j_age.setText(String.valueOf(s.getAge()));
+        //Only if using details layout
+        if (layoutResource == R.layout.student_detail_cell) {
+            TextView tvEmail = convertView.findViewById(R.id.tv_v_row_email);
+            TextView tvMajor = convertView.findViewById(R.id.tv_v_row_major);
+            TextView tvAge = convertView.findViewById(R.id.tv_v_row_age);
+            TextView tvGpa = convertView.findViewById(R.id.tv_v_row_gpa);
 
-        //Since GPA is a double, we have to code this differently also
-        tv_j_gpa.setText(String.valueOf(s.getGpa()));
+            if(tvEmail != null) tvEmail.setText(s.getEmail());
+            if(tvMajor != null) tvMajor.setText(s.getMajorName().getMajorName());
+            if(tvAge != null) tvAge.setText(String.valueOf(s.getAge()));
+            if(tvGpa != null) tvGpa.setText(String.valueOf(s.getGpa()));
+        }
 
         return convertView;
     }
-
 }

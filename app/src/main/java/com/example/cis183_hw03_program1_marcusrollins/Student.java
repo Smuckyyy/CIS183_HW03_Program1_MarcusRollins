@@ -1,6 +1,8 @@
 package com.example.cis183_hw03_program1_marcusrollins;
 
-public class Student
+import java.io.Serializable;
+
+public class Student implements Serializable
 {
     private String username;
     private String fName;
@@ -95,5 +97,11 @@ public class Student
     public void setMajorName(Major majorName)
     {
         this.majorName = majorName;
+    }
+
+    @Override
+    public String toString()
+    {
+        return fName + " " + lName + " (" +username + ")";
     }
 }

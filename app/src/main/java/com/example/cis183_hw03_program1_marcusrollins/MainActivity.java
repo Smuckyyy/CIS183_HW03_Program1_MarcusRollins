@@ -12,8 +12,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity
 {
     DatabaseHelper dbHelper;
     ListView lv_j_listOfStudents;
+    ArrayList<Student> studentList;
+    ArrayAdapter<Student> adapter;
     Button btn_j_addStudent;
     Button btn_j_addMajor;
     Button btn_j_searchPage;
@@ -37,7 +41,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.ConstraintLayout), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -60,24 +64,16 @@ public class MainActivity extends AppCompatActivity
         dbHelper.initAllTables();
 
         //Set up the adapter
-        ArrayList<Student> studentList = dbHelper.getAllStudents();
-        StudentAdapter adapter = new StudentAdapter(this, studentList);
+        studentList = dbHelper.getAllStudents();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, studentList);
         lv_j_listOfStudents.setAdapter(adapter);
-
-        //I NEED TO CALL usernameExists(), and addStudentToDB() (Just have to finish the java side code)**************************************
-
-        buttonCallListeners();
-        //Once you UPDATE or DELETE a student, you need to call this:
-
-        studentsArrayList.addAll(db.getAllStudents());
-        notifyDataSetChanged();
-
-        //Once that ^ is called, it will live update the database so that it reflects the changes
 
         //------------------
         //Function Calls
         //------------------
+        buttonCallListeners();
         checkTableRecordCount();
+        deleteStudent();
     }
 
     @Override
@@ -85,8 +81,9 @@ public class MainActivity extends AppCompatActivity
     {
         super.onResume();
 
+        studentList.clear();
         ArrayList<Student> studentList = dbHelper.getAllStudents();
-        StudentAdapter adapter = new StudentAdapter(this, studentList);
+        StudentAdapter adapter = new StudentAdapter(this, studentList, R.layout.student_cell);
         lv_j_listOfStudents.setAdapter(adapter);
     }
 
@@ -95,6 +92,32 @@ public class MainActivity extends AppCompatActivity
     {
         Log.d("Students Record Count: ", dbHelper.countRecordsFromTable(dbHelper.getStudentsTableName()) + "");
         Log.d("Majors Record Count: ", dbHelper.countRecordsFromTable(dbHelper.getMajorsTableName()) + "");
+    }
+
+    private void deleteStudent()
+    {
+        lv_j_listOfStudents.setOnItemLongClickListener((parent, view, position, id) -> {
+            Student selectedStudent = (Student) parent.getItemAtPosition(position);
+
+            if (selectedStudent == null)
+            {
+                Toast.makeText(this, "Error: Invalid student selected", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            // Delete from database
+            dbHelper.deleteStudent(selectedStudent.getUsername());
+            Toast.makeText(this, "Student deleted successfully", Toast.LENGTH_SHORT).show();
+
+            //Re-query the database for the updated list
+            studentList = dbHelper.getAllStudents();
+
+            //Recreate and reassign the adapter
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, studentList);
+            lv_j_listOfStudents.setAdapter(adapter);
+
+            return true;
+        });
     }
 
     private void buttonCallListeners()
@@ -106,6 +129,26 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 startActivity(new Intent(MainActivity.this, AddStudent.class));
+            }
+        });
+
+        //Add Major
+        btn_j_addMajor.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startActivity(new Intent(MainActivity.this, AddMajor.class));
+            }
+        });
+
+        //Search Data
+        btn_j_searchPage.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startActivity(new Intent(MainActivity.this, SearchStudent.class));
             }
         });
     }

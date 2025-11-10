@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -56,7 +57,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //Initialize tables with dummy data
-    public void initAllTables() {
+    public void initAllTables()
+    {
         initStudents();
         initMajors();
     }
@@ -155,32 +157,149 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return studentList;
     }
 
-    public boolean usernameExists(String username)
+    public boolean studentExists(String username)
     {
         SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT username FROM " + students_table_name + " WHERE username = ?", new String[]{username});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
 
-        //SQL check to see if the username exists (***!!!THIS NEEDS TO BE CALLED WHEN A STUDENT IS ADDED IN addStudent()!!!***)
-        String query = "SELECT COUNT(username) FROM " + students_table_name + " WHERE username = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{username});
+    public boolean majorExists(String majorName)
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT majorName FROM " + majors_table_name + " WHERE majorName = ?", new String[]{majorName});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
+    }
 
-        cursor.moveToFirst();
-        int count = cursor.getInt(0);
+    public void addMajor(Major m)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        //Check for duplicates
+        Cursor cursor = db.rawQuery("SELECT * FROM " + majors_table_name + " WHERE majorName = ?", new String[]{m.getMajorName()});
+
+        if(cursor.getCount() == 0)
+        {
+            //If there are no duplicates, then insert
+            String insertMajor = "INSERT INTO " + majors_table_name + " (majorName, majorPrefix) VALUES ('" + m.getMajorName() + "', '" + m.getMajorPrefix() + "');";
+
+            db.execSQL(insertMajor);
+        }
+
+        cursor.close();
+        db.close();
+    }
+
+    public ArrayList<Major> getAllMajorNames()
+    {
+        ArrayList<Major> majorNames = new ArrayList<>();
+        //Since this is just reading the names we dont need it to be writeable
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT majorName FROM " + majors_table_name, null);
+
+        //We set this up the same way as getting all students with a cursor to search the database
+        if (cursor.moveToFirst())
+        {
+            do
+            {
+                Major major = new Major();
+                major.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
+
+                majorNames.add(major);
+            } while (cursor.moveToNext());
+        }
 
         cursor.close();
         db.close();
 
-        //Return true if the username is taken already
-        return count > 0;
+        return majorNames;
     }
 
-    public void addStudentToDB(Student s)
+    public void deleteStudent(String username)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(students_table_name, "username = ?", new String[]{username});
+        db.close();
+    }
+
+    public void addStudent(Student s)
     {
         //get an instance of a writeable database
         SQLiteDatabase db = this.getWritableDatabase();
 
-        //String insertStudent = "INSERT INTO " + students_table_name + " (fName, lName, email) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajorName() + "');";
-        //db.execSQL(insertStudent);
+        String insertStudent = "INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajorName().getMajorName() + "');";
+        db.execSQL(insertStudent);
 
-        //db.close();
+
+        db.close();
     }
+
+    public ArrayList<Student> searchStudents(String fName, String lName, String username, String major, Double gpaMin, Double gpaMax) {
+        ArrayList<Student> results = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM " + students_table_name + " WHERE 1=1");
+        ArrayList<String> argsList = new ArrayList<>();
+
+        if (fName != null && !fName.isEmpty()) {
+            sql.append(" AND fName LIKE ?");
+            argsList.add("%" + fName + "%");
+        }
+        if (lName != null && !lName.isEmpty()) {
+            sql.append(" AND lName LIKE ?");
+            argsList.add("%" + lName + "%");
+        }
+        if (username != null && !username.isEmpty()) {
+            sql.append(" AND username LIKE ?");
+            argsList.add("%" + username + "%");
+        }
+        if (major != null && !major.isEmpty()) {
+            sql.append(" AND majorName LIKE ?");
+            argsList.add("%" + major + "%");
+        }
+        if (gpaMin != null && gpaMax != null) {
+            sql.append(" AND gpa BETWEEN ? AND ?");
+            argsList.add(String.valueOf(gpaMin));
+            argsList.add(String.valueOf(gpaMax));
+        } else if (gpaMin != null) {
+            sql.append(" AND gpa >= ?");
+            argsList.add(String.valueOf(gpaMin));
+        } else if (gpaMax != null) {
+            sql.append(" AND gpa <= ?");
+            argsList.add(String.valueOf(gpaMax));
+        }
+
+        Cursor cursor = db.rawQuery(sql.toString(), argsList.toArray(new String[0]));
+
+        if (cursor.moveToFirst()) {
+            do {
+                Student student = new Student();
+                student.setUsername(cursor.getString(cursor.getColumnIndexOrThrow("username")));
+                student.setFname(cursor.getString(cursor.getColumnIndexOrThrow("fName")));
+                student.setLname(cursor.getString(cursor.getColumnIndexOrThrow("lName")));
+                student.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
+                student.setAge(cursor.getInt(cursor.getColumnIndexOrThrow("age")));
+                student.setGpa(cursor.getDouble(cursor.getColumnIndexOrThrow("gpa")));
+
+                Major majorObj = new Major();
+                majorObj.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
+                student.setMajorName(majorObj);
+
+                results.add(student);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return results;
+    }
+
 }
