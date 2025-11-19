@@ -10,13 +10,13 @@ public class Student implements Serializable
     private String email;
     private int age;
     private double gpa;
-    private Major majorName; //This is a FK to the Major table
+    private Major major; //This is a FK to the Major table
 
     public Student()
     {
     }
 
-    public Student(String fName, String lName, String username, String email, int age, double gpa, Major majorName)
+    public Student(String fName, String lName, String username, String email, int age, double gpa, Major major)
     {
         this.username = username;
         this.fName = fName;
@@ -24,13 +24,13 @@ public class Student implements Serializable
         this.email = email;
         this.age = age;
         this.gpa = gpa;
-        this.majorName = majorName;
+        this.major = major;
     }
 
-    //I can call this function to get the majorName from the Major class/table
-    public Major getMajorName()
+    //I can call this function to get the major from the Major class/table
+    public Major getMajor()
     {
-        return majorName;
+        return major;
     }
 
     //Getters and Setters
@@ -94,14 +94,14 @@ public class Student implements Serializable
         this.gpa = gpa;
     }
 
-    public void setMajorName(Major majorName)
+    public void setMajor(Major major)
     {
-        this.majorName = majorName;
+        this.major = major;
     }
 
     @Override
     public String toString()
     {
-        return fName + " " + lName + " (" +username + ")";
+        return fName + " " + lName + " (" + username + ")";
     }
 }

@@ -64,7 +64,7 @@ public class StudentAdapter extends BaseAdapter
             TextView tvGpa = convertView.findViewById(R.id.tv_v_row_gpa);
 
             if(tvEmail != null) tvEmail.setText(s.getEmail());
-            if(tvMajor != null) tvMajor.setText(s.getMajorName().getMajorName());
+            if(tvMajor != null && s.getMajor() != null) tvMajor.setText(s.getMajor().getMajorName());
             if(tvAge != null) tvAge.setText(String.valueOf(s.getAge()));
             if(tvGpa != null) tvGpa.setText(String.valueOf(s.getGpa()));
         }

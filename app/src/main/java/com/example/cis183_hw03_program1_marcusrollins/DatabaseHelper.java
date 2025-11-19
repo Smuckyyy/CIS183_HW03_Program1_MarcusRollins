@@ -21,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //change the version number
         //super is used to call the functionality of the base class SQLiteOpenHelper and
         //then executes the extended (DatabaseHelper)
-        super(c, database_name, null, 3);
+        super(c, database_name, null, 4);
     }
 
     //this is called when a new database
@@ -30,7 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //this is where we will create the tables in our database
         //Create table in the database
         //execute the sql statement on the database that was passed to the function called db
-        db.execSQL("CREATE TABLE " + students_table_name + " (username varchar(50) primary key not null, fName varchar(50), lName varchar(50), email varchar(50), age integer, gpa real, majorName varchar(50), foreign key (majorName) references " + majors_table_name + "(majorName));");
+        db.execSQL("CREATE TABLE " + students_table_name + " (username varchar(50) primary key not null, fName varchar(50), lName varchar(50), email varchar(50), age integer, gpa real, majorId integer, foreign key (majorId) references " + majors_table_name + "(majorId));");
         db.execSQL("CREATE TABLE " + majors_table_name + " (majorId integer primary key autoincrement not null, majorName varchar(50), majorPrefix varchar(10));");
     }
 
@@ -75,10 +75,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             //Insert sample student records into the students table.
             //Each student has a unique username (primary key)
             //Along with personal information and a major
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('marcusro26', 'Marcus', 'Rollins', 'mrollins626@gmail.com', '23', '3.33', 'Computer Science');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('madisonho09', 'Madison', 'Homestead', 'madisonh09@gmail.com', '23', '3.40', 'Environmental Science');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('sophie615', 'Sophie', 'Rollins', 'srollins615@gmail.com', '18', '3.54', 'Esthetician');");
-            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('steven711', 'Steven', 'Rollins', 'srollins7112@gmail.com', '56', '3.68', 'Electrician');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorId) VALUES ('marcusro26', 'Marcus', 'Rollins', 'mrollins626@gmail.com', '23', '3.33', '656');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorId) VALUES ('madisonho09', 'Madison', 'Homestead', 'madisonh09@gmail.com', '23', '3.40', '541');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorId) VALUES ('sophie615', 'Sophie', 'Rollins', 'srollins615@gmail.com', '18', '3.54', '222');");
+            db.execSQL("INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorId) VALUES ('steven711', 'Steven', 'Rollins', 'srollins7112@gmail.com', '56', '3.68', '444');");
 
             //Close the database
             db.close();
@@ -127,7 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Student> studentList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + students_table_name, null);
+        Cursor cursor = db.rawQuery("SELECT s.*, m.majorId, m.majorName, m.majorPrefix FROM " + students_table_name + " s " + "JOIN " + majors_table_name + " m ON s.majorId = m.majorId", null);
 
         if (cursor.moveToFirst())
         {
@@ -140,11 +140,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 student.setAge(cursor.getInt(cursor.getColumnIndexOrThrow("age")));
                 student.setGpa(cursor.getDouble(cursor.getColumnIndexOrThrow("gpa")));
 
-                Major majorName = new Major();
-                majorName.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
+                Major major = new Major();
+                major.setMajorId(cursor.getInt(cursor.getColumnIndexOrThrow("majorId")));
+                major.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
+                major.setMajorPrefix(cursor.getString(cursor.getColumnIndexOrThrow("majorPrefix")));
+
 
                 //Attach that major to the student
-                student.setMajorName(majorName);
+                student.setMajor(major);
 
                 studentList.add(student);
             } while (cursor.moveToNext());
@@ -234,18 +237,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //get an instance of a writeable database
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String insertStudent = "INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorName) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajorName().getMajorName() + "');";
+        String insertStudent = "INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorId) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajor() + "');";
         db.execSQL(insertStudent);
 
 
         db.close();
     }
 
-    public ArrayList<Student> searchStudents(String fName, String lName, String username, String major, Double gpaMin, Double gpaMax) {
+    public ArrayList<Student> searchStudents(String fName, String lName, String username, String majorName, Double gpaMin, Double gpaMax) {
         ArrayList<Student> results = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM " + students_table_name + " WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT s.*, m.majorId, m.majorName, m.majorPrefix " + "FROM " + students_table_name + " s " + "JOIN " + majors_table_name + " m ON s.majorId = m.majorId " + "WHERE 1=1");
         ArrayList<String> argsList = new ArrayList<>();
 
         if (fName != null && !fName.isEmpty()) {
@@ -260,9 +263,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             sql.append(" AND username LIKE ?");
             argsList.add("%" + username + "%");
         }
-        if (major != null && !major.isEmpty()) {
+        if (majorName != null && !majorName.isEmpty()) {
             sql.append(" AND majorName LIKE ?");
-            argsList.add("%" + major + "%");
+            argsList.add("%" + majorName + "%");
         }
         if (gpaMin != null && gpaMax != null) {
             sql.append(" AND gpa BETWEEN ? AND ?");
@@ -289,10 +292,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 student.setGpa(cursor.getDouble(cursor.getColumnIndexOrThrow("gpa")));
 
                 Major majorObj = new Major();
+                majorObj.setMajorId(cursor.getInt(cursor.getColumnIndexOrThrow("majorId")));
                 majorObj.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
-                student.setMajorName(majorObj);
+                majorObj.setMajorPrefix(cursor.getString(cursor.getColumnIndexOrThrow("majorPrefix")));
+
+                student.setMajor(majorObj);
 
                 results.add(student);
+
             } while (cursor.moveToNext());
         }
 
