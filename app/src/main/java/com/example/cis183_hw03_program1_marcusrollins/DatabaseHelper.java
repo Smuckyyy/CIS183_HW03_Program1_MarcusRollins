@@ -1,5 +1,6 @@
 package com.example.cis183_hw03_program1_marcusrollins;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
@@ -199,21 +200,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public ArrayList<Major> getAllMajorNames()
-    {
+    public ArrayList<Major> getAllMajorNames() {
         ArrayList<Major> majorNames = new ArrayList<>();
-        //Since this is just reading the names we dont need it to be writeable
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor cursor = db.rawQuery("SELECT majorName FROM " + majors_table_name, null);
+        Cursor cursor = db.rawQuery("SELECT majorId, majorName, majorPrefix FROM " + majors_table_name, null);
 
-        //We set this up the same way as getting all students with a cursor to search the database
-        if (cursor.moveToFirst())
-        {
-            do
-            {
+        if (cursor.moveToFirst()) {
+            do {
+
                 Major major = new Major();
+                major.setMajorId(cursor.getInt(cursor.getColumnIndexOrThrow("majorId")));
                 major.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
+                major.setMajorPrefix(cursor.getString(cursor.getColumnIndexOrThrow("majorPrefix")));
 
                 majorNames.add(major);
             } while (cursor.moveToNext());
@@ -307,6 +306,56 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
 
         return results;
+    }
+
+    public void updateStudent(Student s)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put("fName", s.getFname());
+        cv.put("lName", s.getLname());
+        cv.put("email", s.getEmail());
+        cv.put("age", s.getAge());
+        cv.put("gpa", s.getGpa());
+        cv.put("majorId", s.getMajor().getMajorId());
+
+        db.update(students_table_name, cv, "username = ?", new String[]{s.getUsername()});
+        db.close();
+    }
+
+    public Student getStudentByUsername(String username)
+    {
+        SQLiteDatabase dbHelper = this.getReadableDatabase();
+        Student student = null;
+
+        //JOIN the Majors table exactly like getAllStudents()
+        Cursor cursor = dbHelper.rawQuery(
+                "SELECT s.*, m.majorId, m.majorName, m.majorPrefix " + "FROM " + students_table_name + " s " + "JOIN " + majors_table_name + " m ON s.majorId = m.majorId " + "WHERE s.username = ?", new String[]{ username }
+        );
+
+        if (cursor.moveToFirst())
+        {
+            student = new Student();
+            student.setUsername(cursor.getString(cursor.getColumnIndexOrThrow("username")));
+            student.setFname(cursor.getString(cursor.getColumnIndexOrThrow("fName")));
+            student.setLname(cursor.getString(cursor.getColumnIndexOrThrow("lName")));
+            student.setEmail(cursor.getString(cursor.getColumnIndexOrThrow("email")));
+            student.setAge(cursor.getInt(cursor.getColumnIndexOrThrow("age")));
+            student.setGpa(cursor.getDouble(cursor.getColumnIndexOrThrow("gpa")));
+
+            Major major = new Major();
+            major.setMajorId(cursor.getInt(cursor.getColumnIndexOrThrow("majorId")));
+            major.setMajorName(cursor.getString(cursor.getColumnIndexOrThrow("majorName")));
+            major.setMajorPrefix(cursor.getString(cursor.getColumnIndexOrThrow("majorPrefix")));
+
+            student.setMajor(major);
+        }
+
+        cursor.close();
+        dbHelper.close();
+
+        return student;
     }
 
 }

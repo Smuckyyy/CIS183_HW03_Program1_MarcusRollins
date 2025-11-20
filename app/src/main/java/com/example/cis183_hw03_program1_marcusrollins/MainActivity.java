@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity
         buttonCallListeners();
         checkTableRecordCount();
         deleteStudent();
+        viewUpdateStudent();
     }
 
     @Override
@@ -117,6 +118,21 @@ public class MainActivity extends AppCompatActivity
             lv_j_listOfStudents.setAdapter(adapter);
 
             return true;
+        });
+    }
+
+    private void viewUpdateStudent()
+    {
+        lv_j_listOfStudents.setOnItemClickListener((parent, view, postition, id) ->
+        {
+            Student selectedStudent = (Student) parent.getItemAtPosition(postition);
+
+            Intent intent = new Intent(MainActivity.this, ViewUpdateStudent.class);
+
+            intent.putExtra("username", selectedStudent.getUsername());
+
+            startActivity(intent);
+
         });
     }
 

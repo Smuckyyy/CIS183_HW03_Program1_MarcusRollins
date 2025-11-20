@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CIS183_HW03_Program1_MarcusRollins">
         <activity
+            android:name=".ViewUpdateStudent"
+            android:exported="false" />
+        <activity
             android:name=".SearchStudent"
             android:exported="false" />
         <activity
