@@ -21,6 +21,5 @@ Problems
 -----------------
 
 
-
---The only issue I ran into is time crunch. I wasn't able to implement Updating or viewing Details of a student sadly, but I will update this if I am allowed to edit my project and add those touches. Other than that, SQL is a weird language to get used to, but I feel a bit better with it, except for the quotations and where they should be placed, that still doesn't make much sense to me. 
+--Didn't run into many issues with this project, I had to fix the database to take Major_ID instead of Major_Name because it was breaking JOIN SQL statements. Other than that, I was able to complete the assignment.
 
