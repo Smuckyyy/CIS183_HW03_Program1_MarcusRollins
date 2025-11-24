@@ -236,7 +236,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         //get an instance of a writeable database
         SQLiteDatabase db = this.getWritableDatabase();
 
-        String insertStudent = "INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorId) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajor() + "');";
+        String insertStudent = "INSERT INTO " + students_table_name + " (username, fName, lName, email, age, gpa, majorId) VALUES ('" + s.getUsername() + "','" + s.getFname() + "','" + s.getLname() + "','" + s.getEmail() + "','" + s.getAge() + "','" + s.getGpa() + "','" + s.getMajor().getMajorId() + "');";
         db.execSQL(insertStudent);
 
 
