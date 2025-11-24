@@ -10,7 +10,7 @@ Description
 
 
 
---This program shows a database of students, as an admin; you can view all students. The search function shows a user and all of their information, even if there are empty fields. Adding a student will not allow you to use a username that already exists, and same thing with adding a major. You cannot add unless they are unique. Deleting a student is just long clicking on the student you want to delete.
+--This program shows a database of students, as an admin; you can view all students. The search function shows a user and all of their information, even if there are empty fields. Adding a student will not allow you to use a username that already exists, and same thing with adding a major. You cannot add unless they are unique. Deleting a student is just long clicking on the student you want to delete. Clicking on a student in the listview views the details, and allows the admin to update a student at the same time.
 
 
 
